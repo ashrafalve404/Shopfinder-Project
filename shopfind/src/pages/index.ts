@@ -1,0 +1,9 @@
+export { Landing } from './Landing';
+export { Categories } from './Categories';
+export { Shops } from './Shops';
+export { ShopDetails } from './ShopDetails';
+export { Search } from './Search';
+export { Login } from './Login';
+export { Register } from './Register';
+export { Dashboard } from './Dashboard';
+export { Admin } from './Admin';

@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("user") // user or shop_owner
+  createdAt DateTime @default(now())
+
+  // Relations
+  shops     Shop[]
+  reviews   Review[]
+  comments  Comment[]
+}
+
+// Category model
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  icon      String?
+
+  // Relations
+  shops     Shop[]
+}
+
+// Shop model
+model Shop {
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String?
+  image           String?
+  categoryId      Int?
+  district        String?
+  shoppingComplex String?
+  mapLink         String?
+  latitude        Float?
+  longitude       Float?
+  createdAt       DateTime @default(now())
+
+  // Relations
+  ownerId         Int
+  owner           User     @relation(fields: [ownerId], references: [id])
+  category        Category? @relation(fields: [categoryId], references: [id])
+  products        Product[]
+  reviews         Review[]
+  comments        Comment[]
+}
+
+// Product model
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  price       Float
+  description String?
+  image       String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  shopId      Int
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+// Review model - Users can review a shop only once
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int      // 1-5
+  comment   String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  shopId    Int
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  // Unique constraint - a user can review a shop only once
+  @@unique([userId, shopId])
+}
+
+// Comment model - Both users and shop owners can comment
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  shopId    Int
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
