@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { Plus, Edit, Trash2, Package, Star, Settings } from 'lucide-react';
-import { shopsAPI, productsAPI, categoriesAPI, postsAPI, type Category, type Product, type Shop, type Post } from '../services/api';
+import { shopsAPI, productsAPI, categoriesAPI, postsAPI, type Category, type Product, type Shop } from '../services/api';
 import { Button, Card, CardContent, Input, Modal, LoadingSpinner } from '../components/ui';
 import { Navbar, Footer } from '../components/layout';
 import { useAuth } from '../context/AuthContext';
@@ -100,17 +100,6 @@ export function Dashboard() {
     enabled: !!currentShop,
   });
 
-  // Query for posts of the current shop
-  const { data: postsData } = useQuery({
-    queryKey: ['posts', currentShop?.id],
-    queryFn: async () => {
-      if (!currentShop) return [];
-      const response = await postsAPI.getByShop(currentShop.id);
-      return response.data.data;
-    },
-    enabled: !!currentShop,
-  });
-
   const createShopMutation = useMutation({
     mutationFn: (data: FormData) => shopsAPI.create(data),
     onSuccess: () => {
@@ -181,13 +170,6 @@ export function Dashboard() {
     onError: (error: any) => {
       console.error('Error creating post:', error);
       alert(error.response?.data?.message || 'Failed to create post. Please try again.');
-    },
-  });
-
-  const deletePostMutation = useMutation({
-    mutationFn: (id: number) => postsAPI.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts', currentShop?.id] });
     },
   });
 

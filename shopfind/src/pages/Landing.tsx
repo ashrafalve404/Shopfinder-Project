@@ -27,7 +27,7 @@ export function Landing() {
     },
   });
 
-  const { data: postsData, isLoading: postsLoading } = useQuery({
+  const { data: postsData } = useQuery({
     queryKey: ['feed', 'latest'],
     queryFn: async () => {
       const response = await postsAPI.getAll({ limit: 3 });

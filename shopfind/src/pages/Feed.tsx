@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { postsAPI, type Post } from '../services/api';
-import { Card, CardContent, LoadingSpinner, Button } from '../components/ui';
+import { Card, CardContent, LoadingSpinner } from '../components/ui';
 import { Navbar, Footer } from '../components/layout';
 import { MapPin, Building2, Heart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
