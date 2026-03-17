@@ -23,6 +23,7 @@ model User {
   shops     Shop[]
   reviews   Review[]
   comments  Comment[]
+  likes     Like[]
 }
 
 // Category model
@@ -56,6 +57,7 @@ model Shop {
   products        Product[]
   reviews         Review[]
   comments        Comment[]
+  posts           Post[]
 }
 
 // Product model
@@ -70,6 +72,34 @@ model Product {
   // Relations
   shopId      Int
   shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+// Post model - Promotional posts from shops
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  image     String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  shopId    Int
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  likes     Like[]
+}
+
+// Like model - Users can like posts
+model Like {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId]) // One like per user per post
 }
 
 // Review model - Users can review a shop only once

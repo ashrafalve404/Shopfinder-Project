@@ -127,6 +127,22 @@ const deleteComment = async (req, res, next) => {
   successResponse(res, result, 'Comment deleted successfully');
 };
 
+// Posts management
+const getAllPosts = async (req, res, next) => {
+  const { page = 1, limit = 20 } = req.query;
+  const result = await adminService.getAllPosts({
+    page: parseInt(page),
+    limit: parseInt(limit),
+  });
+  paginatedResponse(res, result.posts, result.pagination, 'Posts retrieved successfully');
+};
+
+const deletePost = async (req, res, next) => {
+  const { id } = req.params;
+  const result = await adminService.deletePost(parseInt(id));
+  successResponse(res, result, 'Post deleted successfully');
+};
+
 module.exports = {
   getStats,
   getAllUsers,
@@ -145,4 +161,6 @@ module.exports = {
   deleteReview,
   getAllComments,
   deleteComment,
+  getAllPosts,
+  deletePost,
 };

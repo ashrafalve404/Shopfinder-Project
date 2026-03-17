@@ -94,6 +94,24 @@ export interface Comment {
   user: { id: number; name: string };
 }
 
+export interface Post {
+  id: number;
+  title: string;
+  content: string | null;
+  image: string | null;
+  createdAt: string;
+  shopId: number;
+  likeCount?: number;
+  hasLiked?: boolean;
+  shop: {
+    id: number;
+    name: string;
+    image: string | null;
+    district: string | null;
+    shoppingComplex: string | null;
+  };
+}
+
 export interface AuthResponse {
   success: boolean;
   message: string;
@@ -162,6 +180,8 @@ export const productsAPI = {
 export const categoriesAPI = {
   getAll: () => api.get<ApiResponse<Category[]>>('/categories'),
   getById: (id: number) => api.get<ApiResponse<Category>>(`/categories/${id}`),
+  create: (data: { name: string; icon?: string }) => 
+    api.post<ApiResponse<Category>>('/categories', data),
 };
 
 // Reviews API
@@ -178,6 +198,20 @@ export const commentsAPI = {
     api.get<ApiResponse<Comment[]>>(`/comments/shop/${shopId}`, { params }),
   create: (data: { content: string; shopId: number }) => 
     api.post<ApiResponse<Comment>>('/comments', data),
+};
+
+// Posts API
+export const postsAPI = {
+  getAll: (params?: { page?: number; limit?: number }) => 
+    api.get<ApiResponse<Post[]>>('/posts', { params }),
+  getById: (id: number) => api.get<ApiResponse<Post>>(`/posts/${id}`),
+  getByShop: (shopId: number) => api.get<ApiResponse<Post[]>>(`/posts/shop/${shopId}`),
+  create: (data: FormData) => api.post<ApiResponse<Post>>('/posts', data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  delete: (id: number) => api.delete<{ success: boolean; message: string }>(`/posts/${id}`),
+  like: (id: number) => api.post<{ success: boolean; message: string }>(`/posts/${id}/like`),
+  unlike: (id: number) => api.delete<{ success: boolean; message: string }>(`/posts/${id}/like`),
 };
 
 // Admin API
@@ -222,6 +256,11 @@ export const adminAPI = {
   getComments: (params?: { page?: number; limit?: number; shopId?: number }) => 
     api.get<ApiResponse<any[]>>('/admin/comments', { params }),
   deleteComment: (id: number) => api.delete<{ success: boolean; message: string }>(`/admin/comments/${id}`),
+
+  // Posts
+  getPosts: (params?: { page?: number; limit?: number }) => 
+    api.get<ApiResponse<any[]>>('/admin/posts', { params }),
+  deletePost: (id: number) => api.delete<{ success: boolean; message: string }>(`/admin/posts/${id}`),
 };
 
 export default api;

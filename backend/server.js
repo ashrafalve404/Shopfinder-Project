@@ -13,6 +13,7 @@ const categoryRoutes = require('./routes/categories');
 const reviewRoutes = require('./routes/reviews');
 const commentRoutes = require('./routes/comments');
 const adminRoutes = require('./routes/admin');
+const postRoutes = require('./routes/posts');
 
 // Import middleware
 const { errorHandler, notFoundHandler } = require('./utils/errorHandler');
@@ -43,6 +44,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/posts', postRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

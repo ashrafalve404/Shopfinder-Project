@@ -40,6 +40,9 @@ export function Navbar() {
             <Link to="/shops?nearby=true" className="text-gray-600 hover:text-primary-600 transition-colors">
               Nearby
             </Link>
+            <Link to="/feed" className="text-gray-600 hover:text-primary-600 transition-colors">
+              Feed
+            </Link>
           </div>
 
           {/* Search Bar */}
@@ -185,6 +188,13 @@ export function Navbar() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Nearby
+              </Link>
+              <Link
+                to="/feed"
+                className="block py-2 text-gray-600"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Feed
               </Link>
 
               {isAuthenticated ? (

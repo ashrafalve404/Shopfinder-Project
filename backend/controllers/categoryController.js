@@ -21,7 +21,19 @@ const getCategoryById = async (req, res, next) => {
   successResponse(res, category, 'Category retrieved successfully');
 };
 
+/**
+ * Create a new category
+ */
+const createCategory = async (req, res, next) => {
+  const { name, icon } = req.body;
+
+  const category = await categoryService.createCategory({ name, icon });
+
+  successResponse(res, category, 'Category created successfully', 201);
+};
+
 module.exports = {
   getAllCategories,
   getCategoryById,
+  createCategory,
 };

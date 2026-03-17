@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { Landing, Categories, Shops, ShopDetails, Search, Login, Register, Dashboard, Admin } from './pages';
+import { Landing, Categories, Shops, ShopDetails, Search, Login, Register, Dashboard, Admin, Feed } from './pages';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +39,7 @@ function AppRoutes() {
       <Route path="/shops" element={<Shops />} />
       <Route path="/shops/:id" element={<ShopDetails />} />
       <Route path="/search" element={<Search />} />
+      <Route path="/feed" element={<Feed />} />
       
       {/* Auth Routes */}
       <Route path="/login" element={<Login />} />

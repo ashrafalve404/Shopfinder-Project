@@ -486,6 +486,76 @@ const deleteComment = async (id) => {
 };
 
 /**
+ * Get all posts (admin)
+ */
+const getAllPosts = async ({ page = 1, limit = 20 }) => {
+  const skip = (page - 1) * limit;
+
+  const [posts, total] = await Promise.all([
+    prisma.post.findMany({
+      skip,
+      take: limit,
+      include: {
+        shop: {
+          include: {
+            owner: {
+              select: { id: true, name: true, email: true },
+            },
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.post.count(),
+  ]);
+
+  // Transform posts to include author from shop owner
+  const transformedPosts = posts.map(post => ({
+    ...post,
+    author: post.shop?.owner || null,
+  }));
+
+  return {
+    posts: transformedPosts,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
+/**
+ * Delete post (admin)
+ */
+const deletePost = async (id) => {
+  const post = await prisma.post.findUnique({
+    where: { id },
+  });
+
+  if (!post) {
+    throw new AppError('Post not found', 404);
+  }
+
+  // Delete likes first
+  await prisma.like.deleteMany({
+    where: { postId: id },
+  });
+
+  await prisma.post.delete({
+    where: { id },
+  });
+
+  return { message: 'Post deleted successfully' };
+};
+
+/**
  * Get dashboard stats (admin)
  */
 const getStats = async () => {
@@ -540,5 +610,7 @@ module.exports = {
   deleteReview,
   getAllComments,
   deleteComment,
+  getAllPosts,
+  deletePost,
   getStats,
 };

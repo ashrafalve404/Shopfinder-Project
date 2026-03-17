@@ -37,4 +37,8 @@ router.delete('/reviews/:id', asyncHandler(adminController.deleteReview));
 router.get('/comments', asyncHandler(adminController.getAllComments));
 router.delete('/comments/:id', asyncHandler(adminController.deleteComment));
 
+// Posts
+router.get('/posts', asyncHandler(adminController.getAllPosts));
+router.delete('/posts/:id', asyncHandler(adminController.deletePost));
+
 module.exports = router;

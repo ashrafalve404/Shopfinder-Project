@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { Plus, Edit, Trash2, Package, Star, Settings } from 'lucide-react';
-import { shopsAPI, productsAPI, categoriesAPI, type Category, type Product, type Shop } from '../services/api';
+import { shopsAPI, productsAPI, categoriesAPI, postsAPI, type Category, type Product, type Shop, type Post } from '../services/api';
 import { Button, Card, CardContent, Input, Modal, LoadingSpinner } from '../components/ui';
 import { Navbar, Footer } from '../components/layout';
 import { useAuth } from '../context/AuthContext';
@@ -12,18 +12,23 @@ import { formatPrice } from '../utils';
 interface ShopForm {
   name: string;
   description: string;
-  categoryId: number;
+  categoryId: number | undefined;
   district: string;
   shoppingComplex: string;
   mapLink: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | undefined;
+  longitude: number | undefined;
 }
 
 interface ProductForm {
   name: string;
   price: number;
   description: string;
+}
+
+interface PostForm {
+  title: string;
+  content: string;
 }
 
 export function Dashboard() {
@@ -38,9 +43,28 @@ export function Dashboard() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedShopId, setSelectedShopId] = useState<number | null>(null);
   const [productImage, setProductImage] = useState<File | null>(null);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
+  const [showPostModal, setShowPostModal] = useState(false);
+  const [postImage, setPostImage] = useState<File | null>(null);
+  const [postImagePreview, setPostImagePreview] = useState<string | null>(null);
 
-  const { register: registerShop, handleSubmit: handleShopSubmit, reset: resetShop } = useForm<ShopForm>();
+  const { register: registerShop, handleSubmit: handleShopSubmit, reset: resetShop, setValue: setShopValue } = useForm<ShopForm>();
   const { register: registerProduct, handleSubmit: handleProductSubmit, reset: resetProduct } = useForm<ProductForm>();
+  const { register: registerPost, handleSubmit: handlePostSubmit, reset: resetPost } = useForm<PostForm>();
+
+  // Helper function to populate shop form for editing
+  const populateShopForm = (shop: Shop) => {
+    setShopValue('name', shop.name || '');
+    setShopValue('description', shop.description || '');
+    setShopValue('categoryId', shop.categoryId || undefined);
+    setShopValue('district', shop.district || '');
+    setShopValue('shoppingComplex', shop.shoppingComplex || '');
+    setShopValue('mapLink', shop.mapLink || '');
+    setShopValue('latitude', shop.latitude || undefined);
+    setShopValue('longitude', shop.longitude || undefined);
+    setImagePreview(shop.image || null);
+  };
 
   const { data: categoriesData } = useQuery({
     queryKey: ['categories'],
@@ -76,12 +100,47 @@ export function Dashboard() {
     enabled: !!currentShop,
   });
 
+  // Query for posts of the current shop
+  const { data: postsData } = useQuery({
+    queryKey: ['posts', currentShop?.id],
+    queryFn: async () => {
+      if (!currentShop) return [];
+      const response = await postsAPI.getByShop(currentShop.id);
+      return response.data.data;
+    },
+    enabled: !!currentShop,
+  });
+
   const createShopMutation = useMutation({
     mutationFn: (data: FormData) => shopsAPI.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-shops'] });
       setShowShopModal(false);
       resetShop();
+      setShopImage(null);
+      setImagePreview(null);
+    },
+    onError: (error: any) => {
+      console.error('Error creating shop:', error);
+      alert(error.response?.data?.message || 'Failed to create shop. Please try again.');
+    },
+  });
+
+  const createCategoryMutation = useMutation({
+    mutationFn: (name: string) => categoriesAPI.create({ name }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      setNewCategoryName('');
+      setShowNewCategoryInput(false);
+      // Set the newly created category as selected
+      const categoryId = data.data.data.id;
+      const selectElement = document.getElementById('category-select') as HTMLSelectElement;
+      if (selectElement) {
+        selectElement.value = categoryId.toString();
+      }
+    },
+    onError: (error: Error) => {
+      alert((error as any).response?.data?.message || 'Failed to create category');
     },
   });
 
@@ -92,6 +151,12 @@ export function Dashboard() {
       setShowShopModal(false);
       setEditingShop(null);
       resetShop();
+      setShopImage(null);
+      setImagePreview(null);
+    },
+    onError: (error: any) => {
+      console.error('Error updating shop:', error);
+      alert(error.response?.data?.message || 'Failed to update shop. Please try again.');
     },
   });
 
@@ -99,6 +164,30 @@ export function Dashboard() {
     mutationFn: (id: number) => shopsAPI.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-shops'] });
+    },
+  });
+
+  // Posts mutation for creating promotional posts
+  const createPostMutation = useMutation({
+    mutationFn: (data: FormData) => postsAPI.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      setShowPostModal(false);
+      resetPost();
+      setPostImage(null);
+      setPostImagePreview(null);
+      alert('Post created successfully! It will appear in the feed.');
+    },
+    onError: (error: any) => {
+      console.error('Error creating post:', error);
+      alert(error.response?.data?.message || 'Failed to create post. Please try again.');
+    },
+  });
+
+  const deletePostMutation = useMutation({
+    mutationFn: (id: number) => postsAPI.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts', currentShop?.id] });
     },
   });
 
@@ -136,11 +225,13 @@ export function Dashboard() {
   const onSubmitShop = (data: ShopForm) => {
     const formData = new FormData();
     formData.append('name', data.name);
-    formData.append('description', data.description);
-    formData.append('categoryId', data.categoryId.toString());
-    formData.append('district', data.district);
-    formData.append('shoppingComplex', data.shoppingComplex);
-    formData.append('mapLink', data.mapLink);
+    
+    // Only append optional fields if they have values
+    if (data.description) formData.append('description', data.description);
+    if (data.categoryId && data.categoryId > 0) formData.append('categoryId', data.categoryId.toString());
+    if (data.district) formData.append('district', data.district);
+    if (data.shoppingComplex) formData.append('shoppingComplex', data.shoppingComplex);
+    if (data.mapLink) formData.append('mapLink', data.mapLink);
     if (data.latitude) formData.append('latitude', data.latitude.toString());
     if (data.longitude) formData.append('longitude', data.longitude.toString());
     
@@ -178,6 +269,23 @@ export function Dashboard() {
       console.log('Creating product...');
       createProductMutation.mutate(formData);
     }
+  };
+
+  const onSubmitPost = (data: PostForm) => {
+    if (!currentShop) {
+      alert('Please select a shop first');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('title', data.title);
+    formData.append('content', data.content);
+    formData.append('shopId', currentShop.id.toString());
+    
+    if (postImage) {
+      formData.append('image', postImage);
+    }
+    
+    createPostMutation.mutate(formData);
   };
 
   if (user?.role !== 'shop_owner') {
@@ -288,6 +396,7 @@ export function Dashboard() {
                           size="sm"
                           onClick={() => {
                             setEditingShop(shop);
+                            populateShopForm(shop);
                             setShowShopModal(true);
                           }}
                         >
@@ -333,10 +442,16 @@ export function Dashboard() {
                     <p className="text-sm text-gray-500 mb-2">
                       Managing products for: <span className="font-medium text-gray-900">{currentShop.name}</span>
                     </p>
-                    <Button size="sm" onClick={() => setShowProductModal(true)}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Product
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={() => setShowProductModal(true)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Product
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => setShowPostModal(true)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Post
+                      </Button>
+                    </div>
                   </div>
                   {productsData && productsData.length === 0 ? (
                     <Card>
@@ -403,6 +518,8 @@ export function Dashboard() {
           resetShop();
           setShopImage(null);
           setImagePreview(null);
+          setNewCategoryName('');
+          setShowNewCategoryInput(false);
         }} 
         title={editingShop ? 'Edit Shop' : 'Create Shop'}
         size="lg"
@@ -417,16 +534,61 @@ export function Dashboard() {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-            <select
-              {...registerShop('categoryId', { valueAsNumber: true })}
-              defaultValue={editingShop?.categoryId || ''}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="">Select category</option>
-              {categoriesData?.map((cat: Category) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
+            {showNewCategoryInput ? (
+              <div className="flex gap-2">
+                <Input
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  placeholder="Enter new category name"
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  onClick={() => {
+                    if (newCategoryName.trim()) {
+                      createCategoryMutation.mutate(newCategoryName.trim());
+                    }
+                  }}
+                  disabled={createCategoryMutation.isPending}
+                  size="sm"
+                >
+                  Add
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowNewCategoryInput(false);
+                    setNewCategoryName('');
+                  }}
+                  size="sm"
+                >
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <select
+                  id="category-select"
+                  {...registerShop('categoryId', { valueAsNumber: true })}
+                  defaultValue={editingShop?.categoryId || ''}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="">Select category</option>
+                  {categoriesData?.map((cat: Category) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowNewCategoryInput(true)}
+                  size="sm"
+                >
+                  + New
+                </Button>
+              </div>
+            )}
           </div>
 
           <Input
@@ -567,6 +729,93 @@ export function Dashboard() {
           <Button type="submit" className="w-full" isLoading={createProductMutation.isPending || updateProductMutation.isPending}>
             {editingProduct ? 'Update Product' : 'Add Product'}
           </Button>
+        </form>
+      </Modal>
+
+      {/* Post Modal - Create Promotional Post */}
+      <Modal
+        isOpen={showPostModal}
+        onClose={() => {
+          setShowPostModal(false);
+          resetPost();
+          setPostImage(null);
+          setPostImagePreview(null);
+        }}
+        title="Create Promotional Post"
+      >
+        <form onSubmit={handlePostSubmit(onSubmitPost)} className="space-y-4">
+          {!currentShop ? (
+            <p className="text-gray-500">Please select a shop first to create a post.</p>
+          ) : (
+            <>
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">Posting as: <span className="font-medium">{currentShop.name}</span></p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Title <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  {...registerPost('title', { required: 'Title is required' })}
+                  placeholder="e.g., Summer Sale - 50% Off!"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Content
+                </label>
+                <textarea
+                  {...registerPost('content')}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Describe your promotion..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Banner Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setPostImage(file);
+                      setPostImagePreview(URL.createObjectURL(file));
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+                {postImagePreview && (
+                  <div className="mt-2 relative inline-block">
+                    <img
+                      src={postImagePreview}
+                      alt="Preview"
+                      className="h-32 w-auto rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPostImage(null);
+                        setPostImagePreview(null);
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <Button type="submit" className="w-full" isLoading={createPostMutation.isPending}>
+                Create Post
+              </Button>
+            </>
+          )}
         </form>
       </Modal>
 

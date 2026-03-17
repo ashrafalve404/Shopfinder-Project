@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, Store, Package, Star, MessageSquare, Settings, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, Store, Package, Star, MessageSquare, Settings, Trash2, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import { adminAPI } from '../services/api';
 import { Button, Card, CardContent, LoadingSpinner } from '../components/ui';
 import { Navbar, Footer } from '../components/layout';
 import { useAuth } from '../context/AuthContext';
 
-type TabType = 'dashboard' | 'users' | 'shops' | 'products' | 'reviews' | 'comments';
+type TabType = 'dashboard' | 'users' | 'shops' | 'products' | 'reviews' | 'comments' | 'posts';
 
 export function Admin() {
   const { user } = useAuth();
@@ -67,6 +67,15 @@ export function Admin() {
       return response.data;
     },
     enabled: activeTab === 'comments',
+  });
+
+  const { data: postsData, isLoading: postsLoading, error: postsError } = useQuery({
+    queryKey: ['admin', 'posts', page],
+    queryFn: async () => {
+      const response = await adminAPI.getPosts({ page, limit });
+      return response.data;
+    },
+    enabled: activeTab === 'posts',
   });
 
   // Mutations
@@ -141,6 +150,18 @@ export function Admin() {
     },
   });
 
+  const deletePostMutation = useMutation({
+    mutationFn: (id: number) => adminAPI.deletePost(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'posts'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
+      alert('Post deleted successfully');
+    },
+    onError: (error: Error) => {
+      alert((error as any).response?.data?.message || 'Failed to delete post');
+    },
+  });
+
   const deleteProductFromShopMutation = useMutation({
     mutationFn: (id: number) => adminAPI.deleteProduct(id),
     onSuccess: () => {
@@ -197,6 +218,7 @@ export function Admin() {
     { id: 'products', label: 'Products', icon: Package },
     { id: 'reviews', label: 'Reviews', icon: Star },
     { id: 'comments', label: 'Comments', icon: MessageSquare },
+    { id: 'posts', label: 'Posts', icon: FileText },
   ];
 
   const renderPagination = (totalPages: number) => (
@@ -668,6 +690,63 @@ export function Admin() {
                         </Card>
                       ))}
                       {renderPagination(commentsData?.pagination?.totalPages || 1)}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Posts */}
+              {activeTab === 'posts' && (
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">Posts Management</h2>
+                  {postsLoading ? (
+                    <LoadingSpinner size="lg" />
+                  ) : postsError ? (
+                    <p className="text-red-500">Error loading posts. Make sure you are logged in as admin.</p>
+                  ) : postsData?.data?.length === 0 ? (
+                    <p className="text-gray-500">No posts found.</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {postsData?.data?.map((post: any) => (
+                        <Card key={post.id}>
+                          <CardContent className="py-4">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="font-medium text-gray-900">{post.author?.name}</span>
+                                  <span className="text-gray-400">•</span>
+                                  <span className="text-sm text-gray-500">from {post.shop?.name || 'Personal'}</span>
+                                </div>
+                                <p className="text-sm text-gray-600 mb-2">{post.content}</p>
+                                {post.image && (
+                                  <img 
+                                    src={post.image} 
+                                    alt="Post" 
+                                    className="w-24 h-24 object-cover rounded-md mb-2"
+                                  />
+                                )}
+                                <div className="flex items-center gap-4 text-xs text-gray-400">
+                                  <span>{post._count?.likes || 0} likes</span>
+                                  <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                                </div>
+                              </div>
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() => {
+                                  if (confirm('Are you sure you want to delete this post?')) {
+                                    deletePostMutation.mutate(post.id);
+                                  }
+                                }}
+                                disabled={deletePostMutation.isPending}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                      {renderPagination(postsData?.pagination?.totalPages || 1)}
                     </div>
                   )}
                 </div>
