@@ -448,6 +448,8 @@ export const postsAPI = {
   create: (data: FormData) => api.post<ApiResponse<Post>>('/posts', data, {
     headers: { 'Content-Type': 'multipart/form-data' },
   }),
+  like: (id: number) => api.post<ApiResponse<any>>(`/posts/${id}/like`),
+  unlike: (id: number) => api.delete<ApiResponse<any>>(`/posts/${id}/like`),
 };
 
 export const reviewsAPI = {
