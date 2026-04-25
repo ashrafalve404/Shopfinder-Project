@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, MapPin, ShoppingBag, Star, ArrowRight, Globe } from 'lucide-react';
+import { Search, MapPin, ShoppingBag, Star, ArrowRight, Globe, Package } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { categoriesAPI, shopsAPI, postsAPI, type Category, type Shop, type Post } from '../services/api';
 import { Button, Card, CardContent, LoadingSpinner } from '../components/ui';
@@ -55,7 +55,7 @@ export function Landing() {
             alt="Hero Background" 
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-900/80 via-primary-800/70 to-accent-900/80" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-950 via-primary-900/90 to-primary-800/80" />
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -78,8 +78,8 @@ export function Landing() {
 
             {/* Search Bar */}
             <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-              <div className="flex gap-2 bg-white/95 p-2 rounded-2xl shadow-xl border border-white/20 backdrop-blur-sm">
-                <div className="flex-1 flex items-center px-4 bg-gray-100 rounded-xl">
+              <div className="flex gap-2 bg-white/95 p-2 rounded-lg shadow-xl border border-white/20 backdrop-blur-sm">
+                <div className="flex-1 flex items-center px-4 bg-gray-100 rounded-lg">
                   <Search className="w-5 h-5 text-gray-500 mr-3" />
                   <input
                     type="text"
@@ -155,7 +155,7 @@ export function Landing() {
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link to="/feed">
-            <div className="relative rounded-2xl overflow-hidden shadow-xl">
+            <div className="relative rounded-lg overflow-hidden shadow-xl">
               <img 
                 src="/postsadvertise.png" 
                 alt="Discover Latest Updates from Your Favorite Shops" 
@@ -255,8 +255,8 @@ export function Landing() {
                 >
                   <Link to={`/shops/${shop.id}`}>
                     <Card hover className="overflow-hidden">
-                      <div className="h-40 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-                        <ShoppingBag className="w-12 h-12 text-primary-600" />
+                      <div className="h-40 bg-gradient-to-br from-primary-600 to-primary-900 flex items-center justify-center">
+                        <ShoppingBag className="w-12 h-12 text-white/50" />
                       </div>
                       <CardContent>
                         <h3 className="font-semibold text-gray-900 mb-1">{shop.name}</h3>
@@ -277,12 +277,17 @@ export function Landing() {
                             View on Map
                           </a>
                         )}
-                        <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
-                          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                          <span className="font-medium">{shop.averageRating || 0}</span>
-                          <span>({shop._count.reviews} reviews)</span>
-                          <span>•</span>
-                          <span>{shop._count.products} products</span>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2 text-xs sm:text-sm text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                            <span className="font-medium">{shop.averageRating || 0}</span>
+                            <span className="text-gray-400">({shop._count.reviews})</span>
+                          </div>
+                          <span className="hidden sm:inline text-gray-300">•</span>
+                          <div className="flex items-center gap-1">
+                            <Package className="w-3.5 h-3.5 text-gray-400" />
+                            <span>{shop._count.products} products</span>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>

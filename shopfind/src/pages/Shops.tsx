@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { MapPin, Star, Filter, Grid, List, Building, Globe } from 'lucide-react';
+import { MapPin, Star, Filter, Grid, List, Building, Globe, Package } from 'lucide-react';
 import { shopsAPI, categoriesAPI, type Shop, type Category } from '../services/api';
 import { Button, Card, CardContent } from '../components/ui';
 import { Navbar, Footer } from '../components/layout';
@@ -104,7 +104,7 @@ export function Shops() {
       <div className="pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top Filters */}
-          <div className="bg-white rounded-xl border border-gray-100 p-4 mb-6">
+          <div className="bg-white rounded-lg border border-gray-100 p-4 mb-6">
             <div className="flex flex-col sm:flex-row gap-4">
               {/* Search */}
               <div className="flex-1">
@@ -167,7 +167,7 @@ export function Shops() {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filters Sidebar */}
             <div className="lg:w-64 flex-shrink-0">
-              <div className="bg-white rounded-xl border border-gray-100 p-4 sticky top-24">
+              <div className="bg-white rounded-lg border border-gray-100 p-4 sticky top-24">
                 <div className="flex items-center gap-2 mb-4">
                   <Filter className="w-5 h-5 text-gray-500" />
                   <h2 className="font-semibold text-gray-900">Filters</h2>
@@ -280,7 +280,7 @@ export function Shops() {
               {isLoading ? (
                 <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[...Array(6)].map((_, i) => (
-                    <div key={i} className="bg-white rounded-xl border border-gray-100 p-4">
+                    <div key={i} className="bg-white rounded-lg border border-gray-100 p-4">
                       <div className="h-40 bg-gray-200 rounded-lg mb-4 animate-pulse" />
                       <div className="h-5 bg-gray-200 rounded mb-2 animate-pulse" />
                       <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse" />
@@ -303,8 +303,8 @@ export function Shops() {
                     >
                       <Link to={`/shops/${shop.id}`}>
                         <Card hover className={viewMode === 'list' ? 'flex' : ''}>
-                          <div className={`${viewMode === 'list' ? 'w-48 h-full' : 'h-40'} bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center`}>
-                            <Star className="w-12 h-12 text-primary-600" />
+                          <div className={`${viewMode === 'list' ? 'w-48 h-full' : 'h-40'} bg-gradient-to-br from-primary-600 to-primary-900 flex items-center justify-center`}>
+                            <Star className="w-12 h-12 text-white/50" />
                           </div>
                           <CardContent className={viewMode === 'list' ? 'flex-1' : ''}>
                             <h3 className="font-semibold text-gray-900 mb-1">{shop.name}</h3>
@@ -331,12 +331,17 @@ export function Shops() {
                                 View on Map
                               </a>
                             )}
-                            <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
-                              <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                              <span className="font-medium">{shop.averageRating || 0}</span>
-                              <span>({shop._count.reviews} reviews)</span>
-                              <span>•</span>
-                              <span>{shop._count.products} products</span>
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2 text-xs sm:text-sm text-gray-600">
+                              <div className="flex items-center gap-1">
+                                <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                                <span className="font-medium">{shop.averageRating || 0}</span>
+                                <span className="text-gray-400">({shop._count.reviews})</span>
+                              </div>
+                              <span className="hidden sm:inline text-gray-300">•</span>
+                              <div className="flex items-center gap-1">
+                                <Package className="w-3.5 h-3.5 text-gray-400" />
+                                <span>{shop._count.products} products</span>
+                              </div>
                             </div>
                           </CardContent>
                         </Card>

@@ -60,7 +60,7 @@ export function Categories() {
                     <Link to={`/shops?category=${category.id}`}>
                       <Card hover className="text-center p-6 h-full">
                         <CardContent className="flex flex-col items-center justify-center h-full">
-                          <div className="w-20 h-20 mb-4 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center">
+                          <div className="w-20 h-20 mb-4 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center">
                             <Icon className="w-10 h-10 text-primary-600" />
                           </div>
                           <h3 className="font-semibold text-gray-900">{category.name}</h3>

@@ -56,7 +56,7 @@ export function Register() {
           {/* Logo */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
                 <ShoppingBag className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold text-gray-900">ShopFinder</span>
@@ -111,7 +111,7 @@ export function Register() {
                   <div className="grid grid-cols-2 gap-3">
                     <label
                       className={cn(
-                        'flex flex-col items-center p-4 rounded-xl border-2 cursor-pointer transition-all',
+                        'flex flex-col items-center p-4 rounded-lg border-2 cursor-pointer transition-all',
                         selectedRole === 'user' 
                           ? 'border-primary-500 bg-primary-50' 
                           : 'border-gray-200 hover:border-gray-300'
@@ -130,7 +130,7 @@ export function Register() {
                     
                     <label
                       className={cn(
-                        'flex flex-col items-center p-4 rounded-xl border-2 cursor-pointer transition-all',
+                        'flex flex-col items-center p-4 rounded-lg border-2 cursor-pointer transition-all',
                         selectedRole === 'shop_owner' 
                           ? 'border-primary-500 bg-primary-50' 
                           : 'border-gray-200 hover:border-gray-300'

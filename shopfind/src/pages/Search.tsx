@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { MapPin, Star, Search as SearchIcon } from 'lucide-react';
+import { MapPin, Star, Search as SearchIcon, Package } from 'lucide-react';
 import { shopsAPI, type Shop } from '../services/api';
 import { Card, CardContent, LoadingSpinner } from '../components/ui';
 import { Navbar, Footer } from '../components/layout';
@@ -70,12 +70,17 @@ export function Search() {
                           <MapPin className="w-4 h-4" />
                           <span>{shop.district || 'Location not specified'}</span>
                         </div>
-                        <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
-                          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                          <span className="font-medium">{shop.averageRating || 0}</span>
-                          <span>({shop._count.reviews} reviews)</span>
-                          <span>•</span>
-                          <span>{shop._count.products} products</span>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2 text-xs sm:text-sm text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                            <span className="font-medium">{shop.averageRating || 0}</span>
+                            <span className="text-gray-400">({shop._count.reviews})</span>
+                          </div>
+                          <span className="hidden sm:inline text-gray-300">•</span>
+                          <div className="flex items-center gap-1">
+                            <Package className="w-3.5 h-3.5 text-gray-400" />
+                            <span>{shop._count.products} products</span>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>

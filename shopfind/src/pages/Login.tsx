@@ -44,7 +44,7 @@ export function Login() {
           {/* Logo */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
                 <ShoppingBag className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold text-gray-900">ShopFinder</span>
@@ -110,7 +110,7 @@ export function Login() {
           </Card>
 
           {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-white/50 rounded-xl border border-gray-100">
+          <div className="mt-6 p-4 bg-white/50 rounded-lg border border-gray-100">
             <p className="text-sm text-gray-600 text-center font-medium mb-2">Demo Credentials</p>
             <div className="grid grid-cols-2 gap-4 text-xs text-gray-500">
               <div>

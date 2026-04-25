@@ -12,7 +12,7 @@ export function Card({ children, className, hover = false, onClick }: CardProps)
   return (
     <div
       className={cn(
-        'bg-white rounded-xl shadow-sm border border-gray-100',
+        'bg-white rounded-lg shadow-sm border border-gray-100',
         hover && 'transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer',
         className
       )}

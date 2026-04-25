@@ -339,21 +339,21 @@ export function Dashboard() {
               {shopsData?.map((shop: Shop) => (
                 <Card key={shop.id}>
                   <CardContent className="p-6">
-                    <div className="flex items-start gap-6">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
                       {shop.image && (
                         <img 
-                          src={`http://localhost:3000${shop.image}`} 
+                          src={shop.image.startsWith('http') ? shop.image : `http://localhost:3000${shop.image}`} 
                           alt={shop.name}
-                          className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
+                          className="w-full sm:w-24 h-48 sm:h-24 object-cover rounded-lg flex-shrink-0"
                         />
                       )}
-                      <div className="flex-1">
+                      <div className="flex-1 text-center sm:text-left">
                         <h2 className="text-2xl font-bold text-gray-900">{shop.name}</h2>
                         <p className="text-gray-600">{shop.category?.name}</p>
                         {shop.description && (
-                          <p className="text-gray-500 mt-2">{shop.description}</p>
+                          <p className="text-gray-500 mt-2 line-clamp-2">{shop.description}</p>
                         )}
-                        <div className="flex gap-4 mt-4">
+                        <div className="flex flex-wrap justify-center sm:justify-start gap-4 mt-4">
                           <div className="flex items-center gap-2">
                             <Package className="w-4 h-4 text-gray-400" />
                             <span className="text-sm">{shop._count?.products || 0} Products</span>
@@ -365,17 +365,19 @@ export function Dashboard() {
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex sm:flex-col gap-2 mt-4 sm:mt-0 w-full sm:w-auto">
                         <Button 
                           variant="outline" 
                           size="sm"
+                          className="flex-1 sm:flex-none"
                           onClick={() => navigate(`/shops/${shop.id}`)}
                         >
-                          View Details
+                          View
                         </Button>
                         <Button 
                           variant="outline" 
                           size="sm"
+                          className="flex-1 sm:flex-none"
                           onClick={() => {
                             setEditingShop(shop);
                             populateShopForm(shop);
@@ -387,6 +389,7 @@ export function Dashboard() {
                         <Button 
                           variant="danger" 
                           size="sm"
+                          className="flex-1 sm:flex-none"
                           onClick={() => {
                             if (confirm('Are you sure you want to delete this shop?')) {
                               deleteShopMutation.mutate(shop.id);

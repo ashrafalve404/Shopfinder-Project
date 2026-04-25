@@ -12,7 +12,7 @@ export function Skeleton({ className }: SkeletonProps) {
 
 export function ShopCardSkeleton() {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-4">
+    <div className="bg-white rounded-lg border border-gray-100 p-4">
       <Skeleton className="h-40 w-full rounded-lg mb-4" />
       <Skeleton className="h-5 w-3/4 mb-2" />
       <Skeleton className="h-4 w-1/2 mb-4" />
@@ -26,7 +26,7 @@ export function ShopCardSkeleton() {
 
 export function CategoryCardSkeleton() {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-6 text-center">
+    <div className="bg-white rounded-lg border border-gray-100 p-6 text-center">
       <Skeleton className="w-16 h-16 rounded-full mx-auto mb-4" />
       <Skeleton className="h-5 w-24 mx-auto" />
     </div>
@@ -35,7 +35,7 @@ export function CategoryCardSkeleton() {
 
 export function ProductCardSkeleton() {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-4">
+    <div className="bg-white rounded-lg border border-gray-100 p-4">
       <Skeleton className="h-32 w-full rounded-lg mb-4" />
       <Skeleton className="h-5 w-3/4 mb-2" />
       <Skeleton className="h-4 w-1/3 mb-4" />

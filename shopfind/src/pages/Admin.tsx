@@ -256,7 +256,7 @@ export function Admin() {
           <div className="flex gap-8">
             {/* Sidebar */}
             <div className="w-64 flex-shrink-0">
-              <div className="bg-white rounded-xl border border-gray-100 p-4 sticky top-24">
+              <div className="bg-white rounded-lg border border-gray-100 p-4 sticky top-24">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}

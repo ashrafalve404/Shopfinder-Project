@@ -172,13 +172,13 @@ export function ShopDetails() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-8"
+            className="bg-white rounded-lg border border-gray-100 overflow-hidden mb-8"
           >
             <div className="h-48 bg-gradient-to-br from-primary-400 to-primary-600" />
             <div className="px-8 pb-8">
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 -mt-16">
                 <div className="flex items-end gap-4">
-                  <div className="w-32 h-32 bg-white rounded-2xl shadow-lg flex items-center justify-center">
+                  <div className="w-32 h-32 bg-white rounded-lg shadow-lg flex items-center justify-center">
                     <div className="text-center">
                       <Star className="w-10 h-10 text-primary-600 mx-auto" fill="currentColor" />
                       <p className="text-2xl font-bold text-gray-900 mt-1">{shop.averageRating || 0}</p>

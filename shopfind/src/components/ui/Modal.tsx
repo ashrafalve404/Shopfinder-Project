@@ -45,7 +45,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', duration: 0.3 }}
-            className={`relative w-full ${sizes[size]} mx-4 bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden`}
+            className={`relative w-full ${sizes[size]} mx-4 bg-white rounded-lg shadow-2xl max-h-[90vh] overflow-hidden`}
           >
             {title && (
               <div className="flex items-center justify-between p-4 border-b border-gray-100">
